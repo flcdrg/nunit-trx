@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
+using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
+using TestContext = Microsoft.VisualStudio.TestTools.UnitTesting.TestContext;
 
 namespace MsTestSampleTest
 {
@@ -8,6 +11,7 @@ namespace MsTestSampleTest
     ///     Summary description for UnitTest1
     /// </summary>
     [TestClass]
+    [TestFixture]
     public class UnitTest1
     {
         ///<summary>
@@ -40,6 +44,7 @@ namespace MsTestSampleTest
         #endregion
 
         [TestMethod]
+        [Test]
         public void TestMethod1()
         {
             Console.WriteLine( "<Console>" );
@@ -50,28 +55,64 @@ namespace MsTestSampleTest
         }
 
         [TestMethod]
+        [Test]
         public void WithAssert()
         {
             Assert.IsTrue(true);
         }
 
         [TestMethod]
+        [Test]
         public void AssertFails()
         {
             Assert.IsTrue(false, "Surprisingly, this test failed");
         }
 
         [TestMethod]
+        [Test]
         public void ThrowsUnexpected()
         {
             throw new InvalidOperationException("An uncaught exception");
         }
 
         [TestMethod]
-        [Ignore]
+        [Test]
+        [Category( "ACategory" )]
+        public void CategorisedTest()
+        {
+
+        }
+
+        [TestMethod]
+        [Test]
+        [NUnit.Framework.Ignore( "Just because" )]
         public void IgnoredTest()
         {
 
         }
+
+        [TestMethod]
+        [Test]
+        [Explicit( "Only run explicitly" )]
+        public void ExplicitTest()
+        {
+
+        }
+
+        [TestMethod]
+        [Test]
+        public void SlowTest()
+        {
+            System.Threading.Thread.Sleep( 1750 );
+        }
+
+        [TestMethod]
+        [Test]
+        [Category( "ExcludedCategory" )]
+        public void ExcludedTestViaCategory()
+        {
+
+        }
+
     }
 }

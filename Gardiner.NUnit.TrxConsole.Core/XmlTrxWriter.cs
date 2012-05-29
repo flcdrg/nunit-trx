@@ -437,6 +437,11 @@ namespace Gardiner.NUnit.TrxConsole.Core
                 _types = _assembly.GetTypes();
             }
 
+            if ( result.Test.TestType == "SetUpTestFixture" )
+            {
+
+            }
+
             if ( result.Test.TestType == "TestFixture" )
             {
                 _currentType = _types.First(
