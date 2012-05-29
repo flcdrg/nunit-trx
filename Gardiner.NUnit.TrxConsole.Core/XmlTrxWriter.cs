@@ -103,6 +103,12 @@ namespace Gardiner.NUnit.TrxConsole.Core
         */
 
         private Dictionary<string, Output> _testOutput;
+        private bool _hasErrorMessage;
+        private bool _hasStackTrace;
+        private bool _hasOutput;
+        private Output _output;
+        private string _message;
+        private string _stackTrace;
 
         public void SaveTestResult( TestResult result, Dictionary<string, Output> testOutput )
         {
@@ -241,7 +247,7 @@ namespace Gardiner.NUnit.TrxConsole.Core
             {
                 //string testId = Guid.NewGuid().ToString();
 
-                var testData = _tests[ result.Test.TestName.Name ];
+                var testData = _tests[ result.FullName ];
                 //testData.TestId = testId;
 
                 // <TestEntry testId="3b9c939b-7610-7a8b-d417-986f31f5d827" executionId="375aceff-59a4-4a04-895f-80e037859456" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
@@ -255,6 +261,23 @@ namespace Gardiner.NUnit.TrxConsole.Core
 
         private void WriteResult( TestResult result )
         {
+            // if failure in setup/cleanup then error will be higher up
+            if ( result.FailureSite != FailureSite.Child && result.FailureSite != FailureSite.Parent )
+            {
+                _hasErrorMessage = !string.IsNullOrEmpty( result.Message );
+                _hasStackTrace = !string.IsNullOrEmpty( result.StackTrace );
+                _hasOutput = _testOutput.ContainsKey( result.FullName );
+
+                if ( _hasOutput )
+                    _output = _testOutput[ result.FullName ];
+
+                if (_hasErrorMessage)
+                    _message = result.Message;
+
+                if ( _hasStackTrace )
+                    _stackTrace = result.StackTrace;
+            }
+
             if ( result.HasResults )
             {
                 foreach ( TestResult childResult in result.Results )
@@ -290,7 +313,7 @@ namespace Gardiner.NUnit.TrxConsole.Core
             {
                 TimeSpan duration = TimeSpan.FromSeconds( result.Time );
 
-                var testData = _tests[ result.Test.TestName.Name ];
+                var testData = _tests[ result.FullName ];
                 _xmlWriter.WriteStartElement( "UnitTestResult" );
 
                 _xmlWriter.WriteAttributeString( "executionId", testData.TestId );
@@ -368,19 +391,14 @@ namespace Gardiner.NUnit.TrxConsole.Core
 //        </ErrorInfo>
 //      </Output>
 
-                var hasErrorMessage = !string.IsNullOrEmpty( result.Message );
-                var hasStackTrace = !string.IsNullOrEmpty( result.StackTrace );
-                var hasOutput = _testOutput.ContainsKey( result.FullName );
 
-                if (result.ResultState != ResultState.Skipped && result.ResultState != ResultState.Ignored && (hasOutput || hasErrorMessage || hasStackTrace))
+                if (result.ResultState != ResultState.Skipped && result.ResultState != ResultState.Ignored && (_hasOutput || _hasErrorMessage || _hasStackTrace))
                 {
                     _xmlWriter.WriteStartElement( "Output" );
 
-                    if ( hasOutput )
+                    if ( _hasOutput )
                     {
-                        Output output = _testOutput[ result.FullName ];
-
-                        string text = output.Out;
+                        string text = _output.Out;
 
                         if (!string.IsNullOrEmpty(text))
                         {
@@ -389,7 +407,7 @@ namespace Gardiner.NUnit.TrxConsole.Core
                             _xmlWriter.WriteEndElement(); // stdout
                         }
 
-                        text = output.Trace;
+                        text = _output.Trace;
 
                         if ( !string.IsNullOrEmpty( text ) )
                         {
@@ -400,15 +418,17 @@ namespace Gardiner.NUnit.TrxConsole.Core
 
                     }
 
-                    if ( hasErrorMessage || hasStackTrace )
+                    if ( _hasErrorMessage || _hasStackTrace )
                     {
                         _xmlWriter.WriteStartElement( "ErrorInfo" );
 
-                        if ( hasErrorMessage )
-                            _xmlWriter.WriteElementString( "Message", result.Message );
+                        if ( _hasErrorMessage )
+                            _xmlWriter.WriteElementString( "Message", _message );
 
-                        if (hasStackTrace)
-                            _xmlWriter.WriteElementString( "StackTrace", result.StackTrace );
+                        if (_hasStackTrace)
+                        {
+                            _xmlWriter.WriteElementString( "StackTrace", _stackTrace );
+                        }
 
                         _xmlWriter.WriteEndElement(); // errorinfo
                     }
@@ -437,11 +457,6 @@ namespace Gardiner.NUnit.TrxConsole.Core
                 _types = _assembly.GetTypes();
             }
 
-            if ( result.Test.TestType == "SetUpTestFixture" )
-            {
-
-            }
-
             if ( result.Test.TestType == "TestFixture" )
             {
                 _currentType = _types.First(
@@ -461,7 +476,9 @@ namespace Gardiner.NUnit.TrxConsole.Core
                 _xmlWriter.WriteAttributeString( "id", executionId );
                 _xmlWriter.WriteEndElement(); // Execution
 
-                _tests.Add( result.Test.TestName.Name, new TestData( executionId ) );
+                string name = result.FullName;
+
+                _tests.Add( name, new TestData( executionId ) );
 
                 // <TestMethod codeBase="C:/dev/Gardiner.NUnit.TrxConsole/TestSamples/Gardiner.NUnit.MsTestSampleTest/bin/Debug/MsTestSampleTest.DLL" 
                 //  adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"

@@ -51,7 +51,8 @@ namespace MsTestSampleTest
             Trace.WriteLine( "Trace" );
             Debug.WriteLine( "Debug" );
 
-            TestContext.WriteLine( "TestContext" );
+            if ( TestContext != null )
+                TestContext.WriteLine( "TestContext" );
         }
 
         [TestMethod]

@@ -7,7 +7,7 @@ namespace MsTestSampleTest
 {
     [TestFixture]
     [TestClass]
-    public class FailingFixture
+    public class FailingTestSetup
     {
 
         ///<summary>

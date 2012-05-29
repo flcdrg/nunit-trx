@@ -56,7 +56,8 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FailingFixture.cs" />
+    <Compile Include="FailingTestSetup.cs" />
+    <Compile Include="FailingFixtureSetup.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UnitTest1.cs" />
   </ItemGroup>
