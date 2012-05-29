@@ -22,7 +22,7 @@ namespace Gardiner.NUnit.TrxConsole.Core
 
         public int Main(string[] args)
         {
-            ConsoleOptions options = new ConsoleOptions(args);
+            var options = new ConsoleOptions(args);
 
             // Create SettingsService early so we know the trace level right at the start
             SettingsService settingsService = new SettingsService();
@@ -119,8 +119,8 @@ namespace Gardiner.NUnit.TrxConsole.Core
             Assembly executingAssembly = Assembly.GetExecutingAssembly();
             string versionText = executingAssembly.GetName().Version.ToString();
 
-            string productName = "NUnit";
-            string copyrightText = "Copyright (C) 2002-2009 Charlie Poole.\r\nCopyright (C) 2002-2004 James W. Newkirk, Michael C. Two, Alexei A. Vorontsov.\r\nCopyright (C) 2000-2002 Philip Craig.\r\nAll Rights Reserved.";
+            string productName = "NUnitTrx";
+            string copyrightText = "Built using NUnit - Copyright (C) 2002-2009 Charlie Poole.\r\nCopyright (C) 2002-2004 James W. Newkirk, Michael C. Two, Alexei A. Vorontsov.\r\nCopyright (C) 2000-2002 Philip Craig.\r\nAll Rights Reserved.";
 
             object[] objectAttrs = executingAssembly.GetCustomAttributes(typeof(AssemblyProductAttribute), false);
             if ( objectAttrs.Length > 0 )
@@ -128,7 +128,7 @@ namespace Gardiner.NUnit.TrxConsole.Core
 
             objectAttrs = executingAssembly.GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false);
             if ( objectAttrs.Length > 0 )
-                copyrightText = ((AssemblyCopyrightAttribute)objectAttrs[0]).Copyright;
+                copyrightText = ( (AssemblyCopyrightAttribute) objectAttrs[ 0 ] ).Copyright + "\n" + copyrightText;
 
             objectAttrs = executingAssembly.GetCustomAttributes(typeof(AssemblyConfigurationAttribute), false);
             if (objectAttrs.Length > 0)

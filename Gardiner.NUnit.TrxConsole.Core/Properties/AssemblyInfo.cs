@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle( "Gardiner.NUnit.TrxConsole.Core" )]
+[assembly: AssemblyTitle( "NUnitTrx" )]
 [assembly: AssemblyDescription( "" )]
 [assembly: AssemblyConfiguration( "" )]
 [assembly: AssemblyCompany( "David Gardiner" )]
-[assembly: AssemblyProduct( "Gardiner.NUnit.TrxConsole.Core" )]
-[assembly: AssemblyCopyright( "Copyright © David Gardiner 2012" )]
+[assembly: AssemblyProduct( "NUnitTrx" )]
+[assembly: AssemblyCopyright( "Copyright (c) David Gardiner 2012" )]
 [assembly: AssemblyTrademark( "" )]
 [assembly: AssemblyCulture( "" )]
 

@@ -9,7 +9,7 @@
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Gardiner.NUnit.ConsoleTrx</RootNamespace>
-    <AssemblyName>NUnit-ConsoleTrx</AssemblyName>
+    <AssemblyName>NUnitTrx-Console</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
