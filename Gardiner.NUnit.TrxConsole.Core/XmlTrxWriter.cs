@@ -160,7 +160,7 @@ namespace Gardiner.NUnit.TrxConsole.Core
             _xmlWriter.WriteEndElement();
 
             _xmlWriter.WriteStartElement( "ResultSummary" );
-            _xmlWriter.WriteAttributeString( "outcome", "Completed" );
+            WriteOutcomeAttribute( result );
 
             // <Counters total="1" executed="1" passed="1" error="0" failed="0" timeout="0" aborted="0" inconclusive="0" 
             // passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
@@ -329,58 +329,7 @@ namespace Gardiner.NUnit.TrxConsole.Core
                 _xmlWriter.WriteAttributeString( "endTime", _current.LocalDateTime.ToString( "O" ) );
                 _xmlWriter.WriteAttributeString( "testType", "13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" );
 
-                //<xs:simpleType name="TestOutcome">
-                //  <xs:restriction base="xs:string">
-                //    <xs:enumeration value="Error"/>
-                //    <xs:enumeration value="Failed"/>
-                //    <xs:enumeration value="Timeout"/>
-                //    <xs:enumeration value="Aborted"/>
-                //    <xs:enumeration value="Inconclusive"/>
-                //    <xs:enumeration value="PassedButRunAborted"/>
-                //    <xs:enumeration value="NotRunnable"/>
-                //    <xs:enumeration value="NotExecuted"/>
-                //    <xs:enumeration value="Disconnected"/>
-                //    <xs:enumeration value="Warning"/>
-                //    <xs:enumeration value="Passed"/>
-                //    <xs:enumeration value="Completed"/>
-                //    <xs:enumeration value="InProgress"/>
-                //    <xs:enumeration value="Pending"/>
-                //  </xs:restriction>
-                //</xs:simpleType>
-
-                string outcome;
-                switch ( result.ResultState )
-                {
-                    case ResultState.Cancelled:
-                        outcome = "Aborted";
-                        break;
-
-                    case ResultState.Ignored:
-                    case ResultState.Skipped:
-                        outcome = "NotExecuted";
-                        break;
-
-                    case ResultState.Error:
-                    case ResultState.Failure:
-                        outcome = "Failed";
-                        break;
-
-                    case ResultState.Inconclusive:
-                        outcome = "Inconclusive";
-                        break;
-
-                    case ResultState.NotRunnable:
-                        outcome = "NotRunnable";
-                        break;
-
-                    case ResultState.Success:
-                        outcome = "Passed";
-                        break;
-                    default:
-                        outcome = string.Empty;
-                        break;
-                }
-                _xmlWriter.WriteAttributeString( "outcome", outcome );
+                WriteOutcomeAttribute( result );
                 _xmlWriter.WriteAttributeString( "testListId", TestListId );
 
                 _xmlWriter.WriteAttributeString( "relativeResultsDirectory", testData.ExecutionId );
@@ -439,6 +388,62 @@ namespace Gardiner.NUnit.TrxConsole.Core
                 }
                 _xmlWriter.WriteEndElement(); // UnitTestResult
             }
+        }
+
+        private void WriteOutcomeAttribute( TestResult result )
+        {
+//<xs:simpleType name="TestOutcome">
+            //  <xs:restriction base="xs:string">
+            //    <xs:enumeration value="Error"/>
+            //    <xs:enumeration value="Failed"/>
+            //    <xs:enumeration value="Timeout"/>
+            //    <xs:enumeration value="Aborted"/>
+            //    <xs:enumeration value="Inconclusive"/>
+            //    <xs:enumeration value="PassedButRunAborted"/>
+            //    <xs:enumeration value="NotRunnable"/>
+            //    <xs:enumeration value="NotExecuted"/>
+            //    <xs:enumeration value="Disconnected"/>
+            //    <xs:enumeration value="Warning"/>
+            //    <xs:enumeration value="Passed"/>
+            //    <xs:enumeration value="Completed"/>
+            //    <xs:enumeration value="InProgress"/>
+            //    <xs:enumeration value="Pending"/>
+            //  </xs:restriction>
+            //</xs:simpleType>
+
+            string outcome;
+            switch ( result.ResultState )
+            {
+                case ResultState.Cancelled:
+                    outcome = "Aborted";
+                    break;
+
+                case ResultState.Ignored:
+                case ResultState.Skipped:
+                    outcome = "NotExecuted";
+                    break;
+
+                case ResultState.Error:
+                case ResultState.Failure:
+                    outcome = "Failed";
+                    break;
+
+                case ResultState.Inconclusive:
+                    outcome = "Inconclusive";
+                    break;
+
+                case ResultState.NotRunnable:
+                    outcome = "NotRunnable";
+                    break;
+
+                case ResultState.Success:
+                    outcome = "Passed";
+                    break;
+                default:
+                    outcome = string.Empty;
+                    break;
+            }
+            _xmlWriter.WriteAttributeString( "outcome", outcome );
         }
 
         private void WriteUnitTest( TestResult result )
