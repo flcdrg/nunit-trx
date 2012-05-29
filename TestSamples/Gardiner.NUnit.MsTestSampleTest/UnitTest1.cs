@@ -79,6 +79,9 @@ namespace MsTestSampleTest
         [TestMethod]
         [Test]
         [Category( "ACategory" )]
+        [Category( "BCategory" )]
+        [TestCategory("ACategory")]
+        [TestCategory("BCategory")]
         public void CategorisedTest()
         {
 
@@ -110,6 +113,7 @@ namespace MsTestSampleTest
         [TestMethod]
         [Test]
         [Category( "ExcludedCategory" )]
+        [TestCategory( "ExcludedCategory" )]
         public void ExcludedTestViaCategory()
         {
 

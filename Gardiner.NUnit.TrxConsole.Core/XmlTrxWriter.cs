@@ -11,6 +11,8 @@ using NUnit.Util;
 
 namespace Gardiner.NUnit.TrxConsole.Core
 {
+    //
+    // TRX Schema file - "C:\Program Files (x86)\Microsoft Visual Studio 10.0\Xml\Schemas\vstst.xsd"
     public class XmlTrxWriter
     {
         private readonly MemoryStream _memoryStream;
@@ -472,6 +474,21 @@ namespace Gardiner.NUnit.TrxConsole.Core
                 var executionId = Guid.NewGuid().ToString();
                 _xmlWriter.WriteAttributeString( "id", executionId );
 
+                //<TestCategory>
+                //  <TestCategoryItem TestCategory="ACategory" />
+                //</TestCategory>
+                if (result.Test.Categories.Count > 0)
+                {
+                    _xmlWriter.WriteStartElement( "TestCategory" );
+                    foreach ( var category in result.Test.Categories )
+                    {
+                        _xmlWriter.WriteStartElement( "TestCategoryItem" );
+                        _xmlWriter.WriteAttributeString( "TestCategory", category.ToString() );
+                        _xmlWriter.WriteEndElement();
+                    }
+                    _xmlWriter.WriteEndElement();
+                    
+                }
                 _xmlWriter.WriteStartElement( "Execution" );
                 _xmlWriter.WriteAttributeString( "id", executionId );
                 _xmlWriter.WriteEndElement(); // Execution
