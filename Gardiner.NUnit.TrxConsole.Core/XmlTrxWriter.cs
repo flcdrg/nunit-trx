@@ -17,13 +17,13 @@ namespace Gardiner.NUnit.TrxConsole.Core
     {
         private readonly MemoryStream _memoryStream;
         private const string TestListId = "8c84fa94-04c1-424b-9868-57a2d4851a1d";
-        private readonly Dictionary<string, TestData> _tests = new Dictionary<string, TestData>();
+        private readonly Dictionary<TestName, TestData> _tests = new Dictionary<TestName, TestData>();
         private readonly TextWriter _writer;
         private readonly XmlWriter _xmlWriter;
         private DateTimeOffset _current;
         private string _storage = "";
         private Assembly _assembly;
-        private Type[] _types;
+        private List<Type> _types;
         private Type _currentType;
 
         public XmlTrxWriter( string fileName )
@@ -249,7 +249,7 @@ namespace Gardiner.NUnit.TrxConsole.Core
             {
                 //string testId = Guid.NewGuid().ToString();
 
-                var testData = _tests[ result.FullName ];
+                var testData = _tests[ result.Test.TestName ];
                 //testData.TestId = testId;
 
                 // <TestEntry testId="3b9c939b-7610-7a8b-d417-986f31f5d827" executionId="375aceff-59a4-4a04-895f-80e037859456" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
@@ -315,7 +315,7 @@ namespace Gardiner.NUnit.TrxConsole.Core
             {
                 TimeSpan duration = TimeSpan.FromSeconds( result.Time );
 
-                var testData = _tests[ result.FullName ];
+                var testData = _tests[ result.Test.TestName ];
                 _xmlWriter.WriteStartElement( "UnitTestResult" );
 
                 _xmlWriter.WriteAttributeString( "executionId", testData.TestId );
@@ -463,7 +463,7 @@ namespace Gardiner.NUnit.TrxConsole.Core
 
                 try
                 {
-                    _types = _assembly.GetTypes();
+                    _types = _assembly.GetTypes().OrderBy(x => x.FullName).ToList();
                 }
                 catch ( ReflectionTypeLoadException ex )
                 {
@@ -478,13 +478,27 @@ namespace Gardiner.NUnit.TrxConsole.Core
 
             if ( result.Test.TestType == "TestFixture" )
             {
+                string fullName = result.FullName;
+
+                int bracketPos = fullName.IndexOf("<", StringComparison.InvariantCulture);
+                if (bracketPos > 0)
+                {
+                    string s = fullName.Substring(0, bracketPos);
+                    string t = fullName.Substring(bracketPos);
+                    int argCount = t.Count(x => x == ',') + 1;
+
+                    fullName = string.Format("{0}`{1}", s, argCount);
+                }
                 _currentType = _types.First(
-                    x => x.FullName == result.FullName
+                    x => x.FullName == fullName
                     );
             }
 
             if ( !result.Test.IsSuite )
             {
+                if (_currentType == null)
+                    return;
+
                 _xmlWriter.WriteStartElement( "UnitTest" );
                 _xmlWriter.WriteAttributeString( "name", result.Name );
                 _xmlWriter.WriteAttributeString( "storage", _storage );
@@ -510,9 +524,7 @@ namespace Gardiner.NUnit.TrxConsole.Core
                 _xmlWriter.WriteAttributeString( "id", executionId );
                 _xmlWriter.WriteEndElement(); // Execution
 
-                string name = result.FullName;
-
-                _tests.Add( name, new TestData( executionId ) );
+                _tests.Add( result.Test.TestName, new TestData( executionId ) );
 
                 // <TestMethod codeBase="C:/dev/Gardiner.NUnit.TrxConsole/TestSamples/Gardiner.NUnit.MsTestSampleTest/bin/Debug/MsTestSampleTest.DLL" 
                 //  adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
