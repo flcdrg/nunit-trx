@@ -457,11 +457,23 @@ namespace Gardiner.NUnit.TrxConsole.Core
 
             if ( result.Test.IsSuite && result.Test.TestType == "Assembly" )
             {
-                _assembly = Assembly.ReflectionOnlyLoadFrom( result.Test.TestName.FullName );
+                _assembly = Assembly.LoadFrom( result.Test.TestName.FullName );
 
                 _storage = Path.GetFileName( _assembly.Location );
 
-                _types = _assembly.GetTypes();
+                try
+                {
+                    _types = _assembly.GetTypes();
+                }
+                catch ( ReflectionTypeLoadException ex )
+                {
+                    Console.Error.WriteLine( "Error loading types from test assembly.\n{0}", ex );
+
+                    foreach ( var loaderException in ex.LoaderExceptions )
+                    {
+                        Console.Error.WriteLine("\t{0}", loaderException);
+                    }
+                }
             }
 
             if ( result.Test.TestType == "TestFixture" )
